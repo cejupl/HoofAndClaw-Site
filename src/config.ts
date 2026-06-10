@@ -4,10 +4,16 @@
 export const site = {
   name: 'Hoof & Claw',
   // Short, evocative hero line.
-  tagline: 'Trust is the rarest prey.',
+  tagline: 'Watch the grass. Trust no one. Survival is the only law.',
+  // Hero lore (no rules revealed).
+  intro: {
+    lead: 'Under the relentless heat of the golden sun, an uneasy peace holds at the watering hole. Among the wandering Herd, a hungry Pack has hidden in plain sight.',
+    body: 'Hoof & Claw is a battle of power, deception, deduction, and survival — the Herd must unite before the migration ends, while the Pack hunts from within and Chaos waits for the perfect moment.',
+    flourish: 'The migration has begun.',
+  },
   // One-sentence positioning — catchy + thematic, no rules revealed.
   positioning:
-    'A board game and companion app that turns any gathering into a night of hope, fear, and beautiful betrayal.',
+    'A board game & companion app that turns any gathering into a night of hope, fear, and beautiful betrayal.',
   description:
     'Hoof & Claw is a board game + companion app of social deduction on the savanna. Friends by day, predators by night. 6–20 players, 15–45 minutes, ages 13+. Join the waitlist for the Kickstarter.',
   domain: 'https://hoofandclaw.org',
