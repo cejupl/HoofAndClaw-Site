@@ -1,0 +1,51 @@
+---
+import '../styles/global.css';
+import SceneBackdrop from '../components/SceneBackdrop.astro';
+import Particles from '../components/Particles.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Hide the fixed dawn->dusk sky (e.g. on blog reading pages). */
+  sky?: boolean;
+}
+
+const {
+  title = 'Hoof & Claw — a savanna game of trust and treachery',
+  description = 'Hoof & Claw is a social-deduction board game set on the savanna. By day the Herd grazes and votes; by night the Pack hunts. Join the waitlist for the Kickstarter.',
+  sky = true,
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = new URL('/og-image.png', Astro.site).href;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <!-- Open Graph / social -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <meta name="theme-color" content="#0a0a12" />
+  </head>
+  <body>
+    {sky && <SceneBackdrop />}
+    {sky && <Particles />}
+    <slot />
+  </body>
+</html>

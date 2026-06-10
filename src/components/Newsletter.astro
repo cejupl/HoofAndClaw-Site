@@ -1,0 +1,162 @@
+---
+import { site } from '../config';
+
+interface Props {
+  variant?: 'hero' | 'panel';
+  heading?: string;
+  sub?: string;
+}
+
+const {
+  variant = 'panel',
+  heading = 'Join the Herd',
+  sub = 'Get dev-log updates and be first in line when the Kickstarter goes live. No spam — just the hunt.',
+} = Astro.props;
+
+const action = `https://buttondown.com/api/emails/embed-subscribe/${site.buttondownUsername}`;
+const isHero = variant === 'hero';
+---
+
+<form
+  class:list={['newsletter', isHero && 'newsletter--hero']}
+  action={action}
+  method="post"
+  target="_blank"
+  data-newsletter
+>
+  {
+    !isHero && (
+      <header class="newsletter__head">
+        <h2 class="newsletter__title display">{heading}</h2>
+        <p class="newsletter__sub">{sub}</p>
+      </header>
+    )
+  }
+  <div class="newsletter__row">
+    <label class="sr-only" for="bd-email">Email address</label>
+    <input
+      id="bd-email"
+      type="email"
+      name="email"
+      required
+      autocomplete="email"
+      placeholder="you@savanna.email"
+      class="newsletter__input"
+    />
+    <button type="submit" class="newsletter__btn">Join the waitlist</button>
+  </div>
+  <p class="newsletter__fine">Double opt-in. Unsubscribe anytime.</p>
+  <p class="newsletter__msg" data-newsletter-msg hidden></p>
+</form>
+
+<style>
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .newsletter {
+    width: 100%;
+    max-width: 34rem;
+  }
+  .newsletter__head {
+    margin-bottom: 1rem;
+  }
+  .newsletter__title {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    color: var(--color-gold-light);
+  }
+  .newsletter__sub {
+    margin-top: 0.5rem;
+    color: var(--color-ink-muted);
+    line-height: 1.5;
+  }
+  .newsletter__row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .newsletter__input {
+    flex: 1 1 14rem;
+    min-width: 0;
+    padding: 0.85rem 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(201, 162, 39, 0.35);
+    background: rgba(10, 10, 18, 0.55);
+    color: var(--color-ink);
+    font-size: 1rem;
+    backdrop-filter: blur(4px);
+  }
+  .newsletter__input::placeholder {
+    color: rgba(196, 169, 106, 0.6);
+  }
+  .newsletter__input:focus-visible {
+    outline: 2px solid var(--color-gold-light);
+    outline-offset: 2px;
+  }
+  .newsletter__btn {
+    flex: 0 0 auto;
+    padding: 0.85rem 1.4rem;
+    border-radius: 0.75rem;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #1a1206;
+    background: linear-gradient(180deg, var(--color-gold-light), var(--color-gold));
+    box-shadow: 0 6px 24px rgba(201, 162, 39, 0.3);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .newsletter__btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 30px rgba(201, 162, 39, 0.45);
+  }
+  .newsletter__fine {
+    margin-top: 0.6rem;
+    font-size: 0.8rem;
+    color: rgba(196, 169, 106, 0.7);
+  }
+  .newsletter__msg {
+    margin-top: 0.6rem;
+    font-size: 0.9rem;
+  }
+  .newsletter__msg[data-state='ok'] {
+    color: var(--color-herd-light);
+  }
+  .newsletter__msg[data-state='err'] {
+    color: var(--color-pack-light);
+  }
+</style>
+
+<script>
+  // Progressive enhancement: submit to Buttondown via fetch so the visitor stays
+  // on the page. Falls back to a normal new-tab POST if JS/fetch fails.
+  document.querySelectorAll<HTMLFormElement>('[data-newsletter]').forEach((form) => {
+    const msg = form.querySelector<HTMLParagraphElement>('[data-newsletter-msg]');
+    form.addEventListener('submit', async (e) => {
+      if (!msg) return;
+      e.preventDefault();
+      const data = new FormData(form);
+      const show = (text: string, state: 'ok' | 'err') => {
+        msg.textContent = text;
+        msg.dataset.state = state;
+        msg.hidden = false;
+      };
+      try {
+        await fetch(form.action, { method: 'POST', body: data, mode: 'no-cors' });
+        form.reset();
+        show('Welcome to the Herd! Check your inbox to confirm.', 'ok');
+      } catch {
+        // no-cors hides errors; this only fires on network failure
+        show('Something went wrong — please try again.', 'err');
+      }
+    });
+  });
+</script>

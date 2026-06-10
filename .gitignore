@@ -1,0 +1,19 @@
+# build output
+dist/
+.astro/
+
+# deps
+node_modules/
+
+# env / secrets
+.env
+.env.*
+!.env.example
+
+# os / editor
+.DS_Store
+*.log
+
+# Midjourney master art (kept locally; the curated, optimized copies in
+# src/assets/{scenes,factions,gallery} + emblem.png are what the site uses).
+src/assets/incoming/

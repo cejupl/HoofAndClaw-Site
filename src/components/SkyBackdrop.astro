@@ -1,0 +1,148 @@
+---
+/**
+ * Fixed, full-viewport sky that transitions golden Dawn -> Dusk -> Night as the
+ * page scrolls. The evening sun sinks below the horizon while the moon rises.
+ * Everything keys off the `--scroll` CSS variable (0..1) set by the inline
+ * script, so it's GPU-cheap (transform/opacity only) and works without JS by
+ * falling back to a mid-dusk scene.
+ */
+---
+
+<div class="sky" aria-hidden="true">
+  <div class="layer sky-dawn"></div>
+  <div class="layer sky-night"></div>
+  <div class="stars"></div>
+
+  <!-- Celestial bodies ride a shared track; the horizon mask hides them once set -->
+  <div class="track">
+    <div class="sun"></div>
+    <div class="moon"></div>
+  </div>
+
+  <!-- Savanna horizon silhouette (acacia trees) -->
+  <svg class="horizon" viewBox="0 0 1440 320" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0,200 C220,150 360,150 520,180 C700,214 820,150 1000,170 C1180,190 1300,160 1440,180 L1440,320 L0,320 Z" fill="#0b0a06"></path>
+    <!-- acacia tree -->
+    <g fill="#0b0a06">
+      <rect x="1140" y="120" width="6" height="90"></rect>
+      <path d="M1090,128 C1110,96 1180,96 1196,128 C1180,118 1110,118 1090,128 Z"></path>
+      <path d="M1080,138 C1110,112 1184,112 1206,138 C1180,130 1108,130 1080,138 Z"></path>
+    </g>
+    <g fill="#0b0a06">
+      <rect x="250" y="150" width="5" height="70"></rect>
+      <path d="M214,156 C232,132 286,132 300,156 C284,148 230,148 214,156 Z"></path>
+    </g>
+  </svg>
+</div>
+
+<style>
+  .sky {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .layer {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* Base layer is dusk; dawn fades out over the first half, night fades in over the second. */
+  .sky {
+    background: linear-gradient(180deg, #b5561e 0%, #d98a3a 38%, #e8b15a 70%, #7c4a2a 100%);
+  }
+  .sky-dawn {
+    background: linear-gradient(180deg, #2a86c9 0%, #7db6d8 30%, #f0d28a 62%, #e8c84a 100%);
+    opacity: clamp(0, calc(1 - var(--scroll) * 2), 1);
+  }
+  .sky-night {
+    background: linear-gradient(180deg, #05060f 0%, #0a0a18 40%, #141233 75%, #2a1d3a 100%);
+    opacity: clamp(0, calc(var(--scroll) * 2 - 1), 1);
+  }
+
+  .stars {
+    position: absolute;
+    inset: 0;
+    opacity: clamp(0, calc(var(--scroll) * 2 - 1), 1);
+    background-image:
+      radial-gradient(1.5px 1.5px at 12% 18%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 28% 32%, #fff, transparent),
+      radial-gradient(1px 1px at 44% 12%, #ffe9c0, transparent),
+      radial-gradient(1.5px 1.5px at 62% 26%, #fff, transparent),
+      radial-gradient(1px 1px at 76% 14%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 88% 30%, #ffe9c0, transparent),
+      radial-gradient(1px 1px at 52% 40%, #fff, transparent),
+      radial-gradient(1px 1px at 8% 44%, #fff, transparent);
+  }
+
+  /* The track spans from high in the sky to just below the horizon line (~78vh). */
+  .track {
+    position: absolute;
+    inset: 0;
+  }
+
+  .sun,
+  .moon {
+    position: absolute;
+    left: 50%;
+    width: 18vmin;
+    height: 18vmin;
+    border-radius: 9999px;
+    transform: translate(-50%, -50%);
+    will-change: top, opacity, filter;
+  }
+
+  /* Sun starts high (12vh) and sinks to below the horizon (88vh). */
+  .sun {
+    top: calc(12vh + var(--scroll) * 76vh);
+    background: radial-gradient(circle at 50% 50%, #fff6d8 0%, #ffd86b 38%, #ff9a3c 70%, rgba(255, 138, 60, 0) 72%);
+    box-shadow: 0 0 14vmin 4vmin rgba(255, 180, 80, 0.45);
+    /* Fade the sun out as it dips under the horizon. */
+    opacity: clamp(0, calc(1.15 - var(--scroll) * 1.4), 1);
+  }
+
+  /* Moon starts below the horizon (108vh) and rises to 16vh. */
+  .moon {
+    top: calc(108vh - var(--scroll) * 92vh);
+    background: radial-gradient(circle at 38% 38%, #fdfcf5 0%, #d9dcea 55%, #aeb2c8 100%);
+    box-shadow: 0 0 9vmin 2vmin rgba(200, 210, 255, 0.25);
+    opacity: clamp(0, calc(var(--scroll) * 1.6 - 0.5), 1);
+  }
+
+  .horizon {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 34vh;
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    const root = document.documentElement;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) return; // global.css pins --scroll at 0.5 for reduced motion
+
+    let ticking = false;
+    const update = () => {
+      // Complete the dawn -> night arc over the first ~2 viewport heights.
+      const span = window.innerHeight * 2;
+      const p = Math.min(1, Math.max(0, window.scrollY / span));
+      root.style.setProperty('--scroll', p.toFixed(4));
+      ticking = false;
+    };
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    update();
+  })();
+</script>

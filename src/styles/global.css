@@ -1,0 +1,75 @@
+/* Fonts must be imported before Tailwind. These match the Hoof & Claw app:
+   Cinzel (display), Nunito (body), IM Fell English (narration). */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Nunito:wght@400;600;700;800&family=IM+Fell+English:ital@0;1&display=swap');
+
+@import 'tailwindcss';
+
+/* ---- Brand tokens (mirrored from src/theme/colors.ts in the game app) ---- */
+@theme {
+  --color-gold: #c9a227;
+  --color-gold-light: #e8c84a;
+  --color-gold-dark: #8b6f15;
+  --color-parchment: #f5e6c8;
+  --color-parchment-muted: #c4a96a;
+
+  --color-herd: #2d5016;
+  --color-herd-light: #8fb339;
+  --color-herd-surface: #1a3d0a;
+
+  --color-pack: #6b1a1a;
+  --color-pack-light: #c94a1a;
+  --color-pack-surface: #3d0a0a;
+
+  --color-chaos: #0d0d0d;
+  --color-chaos-silver: #7a7a7a;
+  --color-chaos-teal: #1abca4;
+  --color-chaos-surface: #1a1a1a;
+
+  --color-night-deep: #0a0a12;
+  --color-night-mid: #151520;
+  --color-night-surface: #1e1e2a;
+
+  --color-dawn-warm: #2a1a08;
+  --color-dawn-surface: #3d2810;
+
+  --color-ink: #f5e6c8;
+  --color-ink-muted: #c4a96a;
+
+  --font-display: 'Cinzel', serif;
+  --font-body: 'Nunito', system-ui, sans-serif;
+  --font-narration: 'IM Fell English', serif;
+}
+
+:root {
+  /* Scroll progress 0 (dawn) -> 1 (night), set by the sky engine in JS. */
+  --scroll: 0;
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  background: var(--color-night-deep);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, .display {
+  font-family: var(--font-display);
+  letter-spacing: 0.02em;
+}
+
+.narration {
+  font-family: var(--font-narration);
+  font-style: italic;
+}
+
+/* Respect users who prefer reduced motion: pin the scene at dusk, no parallax. */
+@media (prefers-reduced-motion: reduce) {
+  :root { --scroll: 0.5; }
+  html { scroll-behavior: auto; }
+}

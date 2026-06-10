@@ -1,0 +1,90 @@
+---
+import { getCollection, render } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+
+<Base title={`${post.data.title} — Hoof & Claw`} description={post.data.description} sky={false}>
+  <header class="reading-nav">
+    <a href="/" class="reading-nav__brand display">Hoof &amp; Claw</a>
+    <a href="/#waitlist" class="reading-nav__cta">Join the waitlist</a>
+  </header>
+
+  <article class="wrap">
+    <a href="/blog" class="back">← Dev log</a>
+    <div class="meta">
+      <span class="tag">{post.data.tag}</span>
+      <time datetime={post.data.date.toISOString()}>{fmt(post.data.date)}</time>
+    </div>
+    <h1 class="title display">{post.data.title}</h1>
+    <p class="lede">{post.data.description}</p>
+    {
+      post.data.cover && (
+        <div class="hero-img">
+          <Image src={post.data.cover} alt={post.data.coverAlt ?? ''} widths={[640, 960, 1280]} sizes="100vw" />
+        </div>
+      )
+    }
+    <div class="prose">
+      <Content />
+    </div>
+
+    <hr />
+    <section class="post-cta">
+      <h2 class="display">Don't miss the next update</h2>
+      <p>Get dev-log posts in your inbox and an early seat for the Kickstarter.</p>
+      <a href="/#waitlist" class="btn">Join the waitlist</a>
+    </section>
+  </article>
+
+  <footer class="reading-foot">
+    <a href="/blog">← All posts</a>
+    <a href="/rss.xml">RSS</a>
+  </footer>
+</Base>
+
+<style>
+  .reading-nav, .reading-foot {
+    display: flex; align-items: center; justify-content: space-between;
+    max-width: 44rem; margin: 0 auto; padding: 1.25rem clamp(1rem, 5vw, 2rem);
+  }
+  .reading-nav__brand { color: var(--color-gold-light); text-decoration: none; font-size: 1.2rem; }
+  .reading-nav__cta { color: var(--color-gold-light); text-decoration: none; border: 1px solid rgba(201,162,39,.5); padding: .4rem .85rem; border-radius: .6rem; font-size: .9rem; }
+  .wrap { max-width: 44rem; margin: 0 auto; padding: 0.5rem clamp(1rem, 5vw, 2rem) 4rem; }
+  .back { color: var(--color-parchment-muted); text-decoration: none; font-size: .9rem; }
+  .back:hover { color: var(--color-gold-light); }
+  .meta { display: flex; gap: .75rem; align-items: center; margin-top: 1.5rem; font-size: .8rem; color: var(--color-parchment-muted); }
+  .tag { color: var(--color-gold-light); letter-spacing: .08em; text-transform: uppercase; }
+  .title { font-size: clamp(2rem, 6vw, 3rem); color: var(--color-gold-light); margin-top: .4rem; line-height: 1.1; text-wrap: balance; }
+  .lede { color: var(--color-parchment); font-size: 1.15rem; line-height: 1.6; margin-top: 1rem; }
+  .hero-img { margin: 1.75rem 0; border-radius: 1rem; overflow: hidden; border: 1px solid rgba(201,162,39,.2); }
+  .hero-img img { width: 100%; height: auto; display: block; }
+
+  .prose { color: var(--color-parchment); line-height: 1.75; font-size: 1.08rem; }
+  .prose :global(h2) { font-family: var(--font-display); color: var(--color-gold-light); font-size: 1.6rem; margin: 2rem 0 .5rem; }
+  .prose :global(h3) { font-family: var(--font-display); color: var(--color-parchment); font-size: 1.3rem; margin: 1.5rem 0 .5rem; }
+  .prose :global(p) { margin: 1rem 0; }
+  .prose :global(a) { color: var(--color-gold-light); }
+  .prose :global(ul), .prose :global(ol) { margin: 1rem 0; padding-left: 1.4rem; }
+  .prose :global(li) { margin: .4rem 0; }
+  .prose :global(blockquote) { border-left: 3px solid var(--color-gold); padding-left: 1rem; color: var(--color-parchment-muted); font-style: italic; }
+  .prose :global(img) { border-radius: .75rem; max-width: 100%; height: auto; }
+  .prose :global(code) { background: rgba(255,255,255,.06); padding: .1rem .35rem; border-radius: .3rem; font-size: .95em; }
+
+  hr { border: none; border-top: 1px solid rgba(201,162,39,.18); margin: 3rem 0 2rem; }
+  .post-cta { text-align: center; }
+  .post-cta h2 { color: var(--color-gold-light); font-size: 1.6rem; }
+  .post-cta p { color: var(--color-parchment-muted); margin: .5rem 0 1.25rem; }
+  .btn { display: inline-block; padding: .8rem 1.6rem; border-radius: .75rem; font-weight: 700; text-decoration: none; color: #1a1206; background: linear-gradient(180deg, var(--color-gold-light), var(--color-gold)); }
+  .reading-foot a { color: var(--color-parchment-muted); text-decoration: none; }
+  .reading-foot a:hover { color: var(--color-gold-light); }
+</style>

@@ -1,0 +1,110 @@
+---
+/**
+ * Lightweight canvas particle field that rides the day->night scroll:
+ * warm dust motes (Dawn) -> glowing fireflies (Dusk) -> cold sparks (Night).
+ * Perf-guarded: capped count, pauses when the tab is hidden, disabled for
+ * prefers-reduced-motion.
+ */
+---
+
+<canvas id="particles" aria-hidden="true"></canvas>
+
+<style>
+  #particles {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #particles { display: none; }
+  }
+</style>
+
+<script>
+  const canvas = document.getElementById('particles') as HTMLCanvasElement | null;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (canvas && !reduce) {
+    const ctx = canvas.getContext('2d')!;
+    let w = 0,
+      h = 0,
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    type P = { x: number; y: number; r: number; vx: number; vy: number; ph: number; sp: number };
+    let parts: P[] = [];
+
+    const resize = () => {
+      w = window.innerWidth;
+      h = window.innerHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      // Density scales with area, capped for perf.
+      const count = Math.min(90, Math.round((w * h) / 24000));
+      parts = Array.from({ length: count }, () => spawn());
+    };
+
+    const spawn = (): P => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: 0.6 + Math.random() * 1.8,
+      vx: (Math.random() - 0.5) * 0.25,
+      vy: -(0.15 + Math.random() * 0.4),
+      ph: Math.random() * Math.PI * 2,
+      sp: 0.6 + Math.random() * 1.4,
+    });
+
+    // Lerp dawn(gold) -> dusk(amber) -> night(cold blue).
+    const colorFor = (s: number): [number, number, number] => {
+      const dawn = [232, 200, 110];
+      const dusk = [255, 150, 70];
+      const night = [180, 200, 255];
+      if (s < 0.5) {
+        const t = s / 0.5;
+        return [0, 1, 2].map((i) => dawn[i] + (dusk[i] - dawn[i]) * t) as [number, number, number];
+      }
+      const t = (s - 0.5) / 0.5;
+      return [0, 1, 2].map((i) => dusk[i] + (night[i] - dusk[i]) * t) as [number, number, number];
+    };
+
+    let t = 0;
+    let running = true;
+    const frame = () => {
+      if (!running) return;
+      t += 0.016;
+      const s = parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue('--scroll') || '0'
+      );
+      const [r, g, b] = colorFor(s);
+      // Fireflies twinkle most at dusk (s≈0.5).
+      const twinkle = 1 - Math.abs(s - 0.5) * 1.4;
+      ctx.clearRect(0, 0, w, h);
+      for (const p of parts) {
+        p.x += p.vx + Math.sin((t + p.ph) * 0.6) * 0.15;
+        p.y += p.vy;
+        if (p.y < -10) { p.y = h + 10; p.x = Math.random() * w; }
+        if (p.x < -10) p.x = w + 10;
+        if (p.x > w + 10) p.x = -10;
+        const flicker = 0.35 + 0.45 * (0.5 + 0.5 * Math.sin((t * p.sp + p.ph) * 2)) * Math.max(0.2, twinkle);
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(${r | 0},${g | 0},${b | 0},${flicker.toFixed(3)})`;
+        ctx.shadowColor = `rgba(${r | 0},${g | 0},${b | 0},0.9)`;
+        ctx.shadowBlur = 6 * p.r;
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.shadowBlur = 0;
+      requestAnimationFrame(frame);
+    };
+
+    document.addEventListener('visibilitychange', () => {
+      running = !document.hidden;
+      if (running) requestAnimationFrame(frame);
+    });
+    window.addEventListener('resize', resize, { passive: true });
+    resize();
+    requestAnimationFrame(frame);
+  }
+</script>

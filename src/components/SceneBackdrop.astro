@@ -1,0 +1,127 @@
+---
+import { Image } from 'astro:assets';
+import dawn from '../assets/scenes/dawn.png';
+import dusk from '../assets/scenes/dusk.png';
+import night from '../assets/scenes/night.png';
+
+/**
+ * Fixed, full-viewport cinematic backdrop. The SAME savanna transforms across
+ * three faction-themed acts as the page scrolls:
+ *   Act I  Dawn  — golden, hopeful        -> THE HERD
+ *   Act II Dusk  — bloodied crimson sky    -> THE PACK
+ *   Act III Night — deep, swallowing dark   -> CHAOS / betrayal
+ * The script sets discrete phase variables (--dawn/--night/--blood/--dark) via
+ * smoothstep so each act holds its tone; CSS only reads them (GPU-cheap).
+ * Without JS it falls back to the dusk base layer.
+ */
+const sizes = '100vw';
+const widths = [768, 1280, 1920, 2560];
+---
+
+<div class="scene" aria-hidden="true">
+  <div class="scene__drift">
+    <Image src={dusk} alt="" class="scene__img scene__dusk" {widths} {sizes} loading="eager" />
+    <Image src={dawn} alt="" class="scene__img scene__dawn" {widths} {sizes} loading="eager" />
+    <Image src={night} alt="" class="scene__img scene__night" {widths} {sizes} loading="eager" />
+  </div>
+  <div class="grade grade--pack"></div>
+  <div class="grade grade--chaos"></div>
+  <div class="scene__scrim"></div>
+  <div class="scene__vignette"></div>
+</div>
+
+<style>
+  .scene { position: fixed; inset: 0; z-index: -2; overflow: hidden; background: #07060c; }
+  .scene__drift {
+    position: absolute;
+    inset: -4%;
+    transform: scale(calc(1.04 + var(--scroll) * 0.12)) translateY(calc(var(--scroll) * -2%));
+  }
+  .scene__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+  .scene__dusk { opacity: 1; }
+  .scene__dawn { opacity: var(--dawn, 1); }
+  .scene__night { opacity: var(--night, 0); }
+
+  .grade { position: absolute; inset: 0; pointer-events: none; }
+  /* THE PACK — bloodied dusk (crimson multiply, peaks mid-scroll). */
+  .grade--pack {
+    background:
+      radial-gradient(115% 95% at 50% 78%, rgba(170, 14, 14, 0.62), rgba(107, 26, 26, 0.4) 45%, transparent 80%),
+      linear-gradient(180deg, rgba(70, 6, 6, 0.32), rgba(150, 22, 14, 0.36));
+    mix-blend-mode: multiply;
+    opacity: var(--blood, 0);
+  }
+  /* CHAOS — betrayal swallows the savanna in dark. */
+  .grade--chaos {
+    background:
+      radial-gradient(135% 105% at 50% 45%, rgba(4, 8, 10, 0.15), rgba(2, 3, 7, 0.85) 82%),
+      linear-gradient(180deg, rgba(2, 4, 7, 0.55), rgba(0, 0, 0, 0.72));
+    opacity: var(--dark, 0);
+  }
+
+  .scene__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(5, 6, 12, calc(0.15 + var(--scroll) * 0.3)) 0%,
+      rgba(5, 6, 12, calc(0.04 + var(--scroll) * 0.22)) 42%,
+      rgba(5, 6, 12, calc(0.32 + var(--scroll) * 0.4)) 100%
+    );
+  }
+  .scene__vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(120% 80% at 50% 38%, transparent 55%, rgba(0, 0, 0, 0.55) 100%);
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    const root = document.documentElement;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      root.style.setProperty('--scroll', '0.5');
+      root.style.setProperty('--dawn', '0');
+      root.style.setProperty('--blood', '0.5');
+      return;
+    }
+    const smoothstep = (a, b, x) => {
+      const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
+      return t * t * (3 - 2 * t);
+    };
+    // Anchor the arc between the Herd act entering and the Chaos act centered,
+    // measured live each frame so image-driven reflow can't desync the phases.
+    // Result: Herd≈0.2, Pack≈0.6, Chaos≈1.0.
+    const anchors = () => {
+      const vh = window.innerHeight;
+      const herd = document.getElementById('herd');
+      const chaos = document.getElementById('chaos');
+      if (!herd || !chaos) return [0, vh * 3];
+      const start = herd.offsetTop - vh * 0.5;
+      const end = chaos.offsetTop + chaos.offsetHeight / 2 - vh / 2;
+      return [start, Math.max(start + vh, end)];
+    };
+    let ticking = false;
+    const update = () => {
+      const [start, end] = anchors();
+      const p = Math.min(1, Math.max(0, (window.scrollY - start) / (end - start)));
+      // Act I dawn holds (golden) through the Herd, then fades.
+      const dawn = 1 - smoothstep(0.3, 0.5, p);
+      // Act II crimson bump peaks across the Pack, gone by deep night.
+      const blood = smoothstep(0.32, 0.55, p) * (1 - smoothstep(0.72, 0.95, p)) * 0.95;
+      // Act III night + dark betrayal arrive late, full by Chaos.
+      const night = smoothstep(0.62, 0.9, p);
+      const dark = smoothstep(0.72, 1.0, p);
+      root.style.setProperty('--scroll', p.toFixed(4));
+      root.style.setProperty('--dawn', dawn.toFixed(4));
+      root.style.setProperty('--night', night.toFixed(4));
+      root.style.setProperty('--blood', blood.toFixed(4));
+      root.style.setProperty('--dark', dark.toFixed(4));
+      ticking = false;
+    };
+    const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    update();
+  })();
+</script>
