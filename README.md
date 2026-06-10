@@ -38,16 +38,20 @@ public/         favicon.svg, og-image.png, robots.txt
 ## Configure before launch
 
 Edit `src/config.ts`:
-- `buttondownUsername` — your Buttondown handle (waitlist form posts here).
+- `kitFormId` — your Kit (ConvertKit) form ID (waitlist form posts here).
 - `links` — Kickstarter / Discord / Instagram / BGG (empty = hidden).
 - `domain` — your real domain (also update `site` in `astro.config.mjs`).
 
-## Newsletter + waitlist (Buttondown)
+## Newsletter + waitlist (Kit / ConvertKit — free to 10k subscribers)
 
-1. Create a free account at <https://buttondown.com> and note your username.
-2. Put it in `src/config.ts` → `buttondownUsername`.
-3. The hero/CTA forms now subscribe visitors (double opt-in, unsubscribe handled
-   by Buttondown).
+1. Create a free account at <https://kit.com>.
+2. **Grow → Landing Pages & Forms → Create a Form** (Inline). Save it.
+3. Copy the **form ID** — it's the number in the form's embed/share URL:
+   `app.kit.com/forms/<THIS_NUMBER>/subscriptions`.
+4. Put that number in `src/config.ts` → `kitFormId`.
+
+The hero/CTA forms now subscribe visitors straight into Kit (double opt-in /
+unsubscribe handled by Kit). No API key is exposed on the site.
 
 ## Writing dev-log posts
 
@@ -69,30 +73,36 @@ Your post body in Markdown…
 
 It appears at `/blog` and `/blog/my-update`, and in the RSS feed at `/rss.xml`.
 
-## Emailing subscribers on each new post
+## Emailing subscribers on each new post (Kit broadcasts)
 
-After deploying a new (non-draft) post:
+After publishing a new (non-draft) post:
 
 ```bash
-BUTTONDOWN_API_KEY=xxxxx npm run notify            # send
-BUTTONDOWN_API_KEY=xxxxx npm run notify -- --dry-run   # preview, no send
+KIT_API_KEY=xxxxx npm run notify            # create a DRAFT broadcast in Kit
+KIT_API_KEY=xxxxx npm run notify -- --send  # create + send immediately
+npm run notify -- --dry-run                 # preview, nothing created
 ```
 
-It emails every subscriber once per post and records sent posts in
-`scripts/.notified.json` (commit that file so a post is never emailed twice).
-You can run it locally or as a CI step after deploy.
+Get the key at **Kit → Settings → Advanced → API** (v4). By default it creates a
+**draft** broadcast (recommended — review/polish in Kit, then hit send). It
+records announced posts in `scripts/.notified.json` (commit it so a post is never
+announced twice). Run locally or as a CI step after deploy.
 
-## Deploy to Vercel
+## Deploy to Cloudflare Pages (free, unlimited bandwidth)
 
 1. Push this folder to its own GitHub repo.
-2. In Vercel: **New Project → import the repo**. Astro is auto-detected
-   (build `astro build`, output `dist/`). No env vars needed for the site itself.
-3. Add your custom domain in Vercel → Settings → Domains.
-4. (Optional) Add `BUTTONDOWN_API_KEY` as a Vercel env var only if you wire the
-   notify script into a deploy hook; otherwise run `npm run notify` locally.
+2. **Cloudflare dashboard → Workers & Pages → Create → Pages → Connect to Git**,
+   pick the repo.
+3. Build settings (auto-detected for Astro, but confirm):
+   - **Framework preset:** Astro
+   - **Build command:** `npm run build`
+   - **Build output directory:** `dist`
+4. Deploy. You get a `*.pages.dev` URL immediately.
+5. **Custom domain:** Pages → your project → Custom domains → add your domain.
+   Cheapest domain: **Cloudflare → Registrar** (sold at cost, no renewal markup).
 
-Cloudflare Pages / Netlify work the same way (build `npm run build`, output
-`dist`).
+> Vercel/Netlify work identically (same build command + `dist` output) if you
+> ever switch.
 
 ## Swapping art
 

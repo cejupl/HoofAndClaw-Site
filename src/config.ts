@@ -19,8 +19,9 @@ export const site = {
     { value: '13+', label: 'Ages' },
   ],
 
-  // Buttondown newsletter username (https://buttondown.com/<username>).
-  buttondownUsername: 'hoofandclaw',
+  // Kit (ConvertKit) signup form. Create a Form in Kit, then use its ID — the
+  // number in the form's embed URL: app.kit.com/forms/<THIS>/subscriptions.
+  kitFormId: 'YOUR_FORM_ID',
 
   // Community / social links — empty strings are hidden.
   links: {

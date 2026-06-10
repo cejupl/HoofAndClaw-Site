@@ -13,7 +13,8 @@ const {
   sub = 'Get dev-log updates and be first in line when the Kickstarter goes live. No spam — just the hunt.',
 } = Astro.props;
 
-const action = `https://buttondown.com/api/emails/embed-subscribe/${site.buttondownUsername}`;
+// Kit (ConvertKit) form endpoint — no API key needed client-side.
+const action = `https://app.kit.com/forms/${site.kitFormId}/subscriptions`;
 const isHero = variant === 'hero';
 ---
 
@@ -33,11 +34,11 @@ const isHero = variant === 'hero';
     )
   }
   <div class="newsletter__row">
-    <label class="sr-only" for="bd-email">Email address</label>
+    <label class="sr-only" for="nl-email">Email address</label>
     <input
-      id="bd-email"
+      id="nl-email"
       type="email"
-      name="email"
+      name="email_address"
       required
       autocomplete="email"
       placeholder="you@savanna.email"

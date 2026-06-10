@@ -1,16 +1,21 @@
 #!/usr/bin/env node
 /**
- * Email subscribers when a new blog post is published.
+ * Turn a newly-published blog post into a Kit (ConvertKit) broadcast to your
+ * subscribers.
  *
- * Scans src/content/blog for non-draft posts, and for any post not yet recorded
- * in scripts/.notified.json, creates + sends a Buttondown email, then records it.
+ * Scans src/content/blog for non-draft posts. For any post not yet in
+ * scripts/.notified.json it creates a Kit broadcast, then records the slug.
+ *
+ * By default it creates the broadcast as a DRAFT — you review and hit send in
+ * Kit (recommended for a newsletter). Pass --send to schedule it immediately.
  *
  * Usage:
- *   BUTTONDOWN_API_KEY=xxx node scripts/notify-subscribers.mjs        # send
- *   BUTTONDOWN_API_KEY=xxx node scripts/notify-subscribers.mjs --dry-run
+ *   KIT_API_KEY=xxx node scripts/notify-subscribers.mjs            # create draft
+ *   KIT_API_KEY=xxx node scripts/notify-subscribers.mjs --send     # send now
+ *   node scripts/notify-subscribers.mjs --dry-run                  # preview only
  *
- * Run it after deploying a new post (locally, or as a CI step). Commit the
- * updated scripts/.notified.json so the same post is never emailed twice.
+ * Get an API key: Kit → Settings → Advanced → API (v4 key). Commit the updated
+ * scripts/.notified.json so a post is never announced twice.
  */
 import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -21,12 +26,10 @@ const ROOT = join(__dirname, '..');
 const BLOG_DIR = join(ROOT, 'src/content/blog');
 const LEDGER = join(__dirname, '.notified.json');
 
-// --- config (keep in sync with src/config.ts) ---
 const SITE = process.env.SITE_URL || 'https://hoofandclaw.game';
-const FROM_NAME = 'Hoof & Claw';
-
+const KEY = process.env.KIT_API_KEY;
 const DRY = process.argv.includes('--dry-run');
-const KEY = process.env.BUTTONDOWN_API_KEY;
+const SEND = process.argv.includes('--send');
 
 function parseFrontmatter(raw) {
   const m = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
@@ -43,83 +46,68 @@ function parseFrontmatter(raw) {
   return data;
 }
 
-function loadLedger() {
+const loadLedger = () => {
   if (!existsSync(LEDGER)) return [];
-  try {
-    return JSON.parse(readFileSync(LEDGER, 'utf8'));
-  } catch {
-    return [];
-  }
-}
+  try { return JSON.parse(readFileSync(LEDGER, 'utf8')); } catch { return []; }
+};
 
-async function sendEmail({ subject, body }) {
-  const res = await fetch('https://api.buttondown.email/v1/emails', {
+async function createBroadcast({ subject, html }) {
+  const body = {
+    subject,
+    content: html,
+    public: false,
+    // Setting send_at schedules the broadcast; omitting it leaves a draft.
+    ...(SEND ? { send_at: new Date().toISOString() } : {}),
+  };
+  const res = await fetch('https://api.kit.com/v4/broadcasts', {
     method: 'POST',
-    headers: {
-      Authorization: `Token ${KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ subject, body, status: 'about_to_send' }),
+    headers: { 'X-Kit-Api-Key': KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
   });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Buttondown ${res.status}: ${text}`);
-  }
+  if (!res.ok) throw new Error(`Kit ${res.status}: ${await res.text()}`);
   return res.json();
 }
 
 async function main() {
-  if (!existsSync(BLOG_DIR)) {
-    console.error('No blog dir at', BLOG_DIR);
-    process.exit(1);
-  }
-  const files = readdirSync(BLOG_DIR).filter((f) => /\.mdx?$/.test(f));
+  if (!existsSync(BLOG_DIR)) { console.error('No blog dir at', BLOG_DIR); process.exit(1); }
   const ledger = loadLedger();
   const today = new Date();
-
   const pending = [];
-  for (const file of files) {
+  for (const file of readdirSync(BLOG_DIR).filter((f) => /\.mdx?$/.test(f))) {
     const slug = file.replace(/\.mdx?$/, '');
     if (ledger.includes(slug)) continue;
-    const raw = readFileSync(join(BLOG_DIR, file), 'utf8');
-    const fm = parseFrontmatter(raw);
+    const fm = parseFrontmatter(readFileSync(join(BLOG_DIR, file), 'utf8'));
     if (fm.draft === true) continue;
-    if (fm.date && new Date(fm.date) > today) continue; // future-dated
+    if (fm.date && new Date(fm.date) > today) continue;
     pending.push({ slug, fm });
   }
 
-  if (pending.length === 0) {
-    console.log('✓ Nothing new to send.');
-    return;
-  }
+  if (pending.length === 0) { console.log('✓ Nothing new to announce.'); return; }
 
-  console.log(`${pending.length} post(s) to announce${DRY ? ' (dry run)' : ''}:`);
+  console.log(`${pending.length} post(s)${DRY ? ' (dry run)' : SEND ? ' → SEND NOW' : ' → draft'}:`);
   for (const { slug, fm } of pending) {
     const url = `${SITE}/blog/${slug}/`;
-    const subject = `${FROM_NAME}: ${fm.title}`;
-    const body =
-      `${fm.description}\n\n` +
-      `[Read the full update →](${url})\n\n` +
-      `— The Hoof & Claw team\n\n` +
-      `You're getting this because you joined the waitlist. Trust no one. 🦓`;
+    const subject = `${site_name()}: ${fm.title}`;
+    const html =
+      `<p>${escapeHtml(fm.description)}</p>` +
+      `<p><a href="${url}">Read the full update →</a></p>` +
+      `<p>— The Hoof &amp; Claw team</p>` +
+      `<p style="color:#888;font-size:13px">You're getting this because you joined the waitlist. Trust no one. 🦓</p>`;
 
     console.log(`  • ${slug} → "${subject}"`);
     if (DRY) continue;
-    if (!KEY) {
-      console.error('  ✗ BUTTONDOWN_API_KEY not set — skipping send.');
-      process.exit(1);
-    }
+    if (!KEY) { console.error('  ✗ KIT_API_KEY not set.'); process.exit(1); }
     try {
-      await sendEmail({ subject, body });
+      await createBroadcast({ subject, html });
       ledger.push(slug);
       writeFileSync(LEDGER, JSON.stringify(ledger, null, 2) + '\n');
-      console.log('    ✓ sent + recorded');
-    } catch (e) {
-      console.error('    ✗', e.message);
-      process.exit(1);
-    }
+      console.log(SEND ? '    ✓ broadcast scheduled + recorded' : '    ✓ draft created in Kit + recorded (review & send there)');
+    } catch (e) { console.error('    ✗', e.message); process.exit(1); }
   }
-  if (DRY) console.log('\nDry run — no emails sent, ledger unchanged.');
+  if (DRY) console.log('\nDry run — nothing created, ledger unchanged.');
 }
+
+const site_name = () => 'Hoof & Claw';
+const escapeHtml = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 main();
