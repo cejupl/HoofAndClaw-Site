@@ -26,7 +26,7 @@ const ROOT = join(__dirname, '..');
 const BLOG_DIR = join(ROOT, 'src/content/blog');
 const LEDGER = join(__dirname, '.notified.json');
 
-const SITE = process.env.SITE_URL || 'https://hoofandclaw.game';
+const SITE = process.env.SITE_URL || 'https://hoofandclaw.org';
 const KEY = process.env.KIT_API_KEY;
 const DRY = process.argv.includes('--dry-run');
 const SEND = process.argv.includes('--send');

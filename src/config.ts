@@ -10,7 +10,7 @@ export const site = {
     'A board game and companion app that turns any gathering into a night of hope, fear, and beautiful betrayal.',
   description:
     'Hoof & Claw is a board game + companion app of social deduction on the savanna. Friends by day, predators by night. 6–20 players, 15–45 minutes, ages 13+. Join the waitlist for the Kickstarter.',
-  domain: 'https://hoofandclaw.game',
+  domain: 'https://hoofandclaw.org',
 
   // Play stats (advertised).
   stats: [
@@ -21,7 +21,7 @@ export const site = {
 
   // Kit (ConvertKit) signup form. Create a Form in Kit, then use its ID — the
   // number in the form's embed URL: app.kit.com/forms/<THIS>/subscriptions.
-  kitFormId: 'YOUR_FORM_ID',
+  kitFormId: '9548265',
 
   // Community / social links — empty strings are hidden.
   links: {

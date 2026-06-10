@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://hoofandclaw.game/sitemap-index.xml
+Sitemap: https://hoofandclaw.org/sitemap-index.xml

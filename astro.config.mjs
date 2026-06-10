@@ -5,7 +5,7 @@ import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
 // Update this to your real domain before launch (used for SEO + sitemap).
-const SITE = 'https://hoofandclaw.game';
+const SITE = 'https://hoofandclaw.org';
 
 // https://astro.build/config
 export default defineConfig({
