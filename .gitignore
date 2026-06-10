@@ -17,3 +17,8 @@ node_modules/
 # Midjourney master art (kept locally; the curated, optimized copies in
 # src/assets/{scenes,factions,gallery} + emblem.png are what the site uses).
 src/assets/incoming/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
