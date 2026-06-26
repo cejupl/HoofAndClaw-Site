@@ -134,6 +134,18 @@ const isHero = variant === 'hero';
   .newsletter__msg[data-state='err'] {
     color: var(--color-pack-light);
   }
+
+  /* Mobile: stack the field and button, with the button full-width below the
+     email box (centered). Desktop keeps them side by side. */
+  @media (max-width: 640px) {
+    .newsletter__row {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .newsletter__btn {
+      width: 100%;
+    }
+  }
 </style>
 
 <script>
