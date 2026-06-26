@@ -10,7 +10,7 @@ const kickstarter = site.links.kickstarter || '';
     <p class="quiz__eyebrow narration">The Monkey is watching</p>
     <h1 class="quiz__title display">Which Animal Are You?</h1>
     <p class="quiz__sub">
-      Five questions. The savanna already knows what you are — answer honestly and
+      Five questions. The savanna already knows what you are - answer honestly and
       the Monkey will name your role in <strong>Hoof &amp; Claw</strong>.
     </p>
   </header>
@@ -375,19 +375,19 @@ const kickstarter = site.links.kickstarter || '';
       const claim = result.querySelector<HTMLAnchorElement>('[data-result-claim]')!;
       if (kickstarter) {
         claim.href = kickstarter;
-        claim.textContent = 'Claim your role — back us on Kickstarter →';
+        claim.textContent = 'Claim your role - back us on Kickstarter →';
         claim.target = '_blank';
         claim.rel = 'noopener';
       } else {
         claim.href = '/#waitlist';
-        claim.textContent = 'Claim your role — join the waitlist →';
+        claim.textContent = 'Claim your role - join the waitlist →';
       }
 
       const shareBtn = result.querySelector<HTMLButtonElement>('[data-result-share]')!;
       const shareMsg = result.querySelector<HTMLParagraphElement>('[data-result-sharemsg]')!;
       shareBtn.onclick = async () => {
         const shareData = {
-          title: 'Hoof & Claw — Which Animal Are You?',
+          title: 'Hoof & Claw - Which Animal Are You?',
           text: r.shareText,
           url: location.href,
         };
@@ -396,11 +396,11 @@ const kickstarter = site.links.kickstarter || '';
             await navigator.share(shareData);
           } else {
             await navigator.clipboard.writeText(`${r.shareText} ${location.href}`);
-            shareMsg.textContent = 'Copied to your clipboard — go share it!';
+            shareMsg.textContent = 'Copied to your clipboard - go share it!';
             shareMsg.hidden = false;
           }
         } catch {
-          /* user dismissed the share sheet — ignore */
+          /* user dismissed the share sheet - ignore */
         }
       };
 

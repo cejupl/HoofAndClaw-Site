@@ -10,10 +10,10 @@ interface Props {
 const {
   variant = 'panel',
   heading = 'Join the Herd',
-  sub = 'Get dev-log updates and be first in line when the Kickstarter goes live. No spam — just the hunt.',
+  sub = 'Get dev-log updates and be first in line when the Kickstarter goes live. No spam - just the hunt.',
 } = Astro.props;
 
-// Kit (ConvertKit) form endpoint — no API key needed client-side.
+// Kit (ConvertKit) form endpoint - no API key needed client-side.
 const action = `https://app.kit.com/forms/${site.kitFormId}/subscriptions`;
 const isHero = variant === 'hero';
 ---
@@ -174,7 +174,7 @@ const isHero = variant === 'hero';
         show('Welcome to the Herd! Check your inbox to confirm.', 'ok');
       } catch {
         // no-cors hides errors; this only fires on network failure
-        show('Something went wrong — please try again.', 'err');
+        show('Something went wrong - please try again.', 'err');
       }
     });
   });

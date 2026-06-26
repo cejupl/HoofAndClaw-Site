@@ -7,7 +7,7 @@ export async function GET(context) {
   );
 
   return rss({
-    title: 'Hoof & Claw — Dev Log',
+    title: 'Hoof & Claw - Dev Log',
     description: "Behind the scenes on Hoof & Claw: art, design notes, and the road to Kickstarter.",
     site: context.site,
     items: posts.map((post) => ({

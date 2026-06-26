@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import Anthropic from '@anthropic-ai/sdk';
 import { quiz } from '../../config';
 
-// On-demand (serverless) route — NOT prerendered — so the API key stays server-side.
+// On-demand (serverless) route - NOT prerendered - so the API key stays server-side.
 export const prerender = false;
 
 /**
@@ -11,33 +11,33 @@ export const prerender = false;
  * `identity` is a one-line steer for Claude, not marketing copy.
  */
 const ROLES: { name: string; faction: 'herd' | 'pack' | 'chaos'; identity: string }[] = [
-  // Herd — the many, surviving by trust.
-  { name: 'Elephant', faction: 'herd', identity: 'The Titan — immovable and protective, the herd\'s living wall.' },
-  { name: 'Hippo', faction: 'herd', identity: 'The Retaliator — placid until provoked, strikes back even from death.' },
-  { name: 'Rhino', faction: 'herd', identity: 'The Shield — stands guard over a neighbor through the night.' },
-  { name: 'Cape Buffalo', faction: 'herd', identity: 'The Iron Horn — silences and subdues through sheer presence.' },
-  { name: 'Giraffe', faction: 'herd', identity: 'The High Watch — sees danger coming before anyone else.' },
-  { name: 'Zebra', faction: 'herd', identity: 'The Unpredictable — survival on a coin-flip, chaos as camouflage.' },
-  { name: 'Boar', faction: 'herd', identity: 'The Informant — even in death, drags the truth into the light.' },
-  { name: 'Honey Badger', faction: 'herd', identity: 'The Wall — fearless, nearly unkillable, gives no ground.' },
-  { name: 'Pangolin', faction: 'herd', identity: 'The Witness — curls away from one fatal blow, then bears the cost.' },
-  { name: 'Meerkat', faction: 'herd', identity: 'The Investigator — one careful look that reveals friend or fang.' },
-  { name: 'Rabbit', faction: 'herd', identity: 'The Spreader — small, but tips the vote from beyond the grave.' },
-  // Pack — hunters wearing familiar faces.
-  { name: 'Lion', faction: 'pack', identity: 'The Enforcer — leads the hunt; their word counts double.' },
-  { name: 'Black Panther', faction: 'pack', identity: 'The Assassin — strikes alone from the shadows.' },
-  { name: 'Cheetah', faction: 'pack', identity: 'The Escape Artist — too fast to catch, slips a death.' },
-  { name: 'Wild Dog', faction: 'pack', identity: 'The Brawler — stronger in numbers, relentless.' },
-  { name: 'Hyena', faction: 'pack', identity: 'The Echo — learns the night\'s secrets and laughs last.' },
-  // Chaos — neither prey nor pack.
-  { name: 'Crocodile', faction: 'chaos', identity: 'The Apex — patient, unaligned, outlasts them all.' },
-  { name: 'Black Mamba', faction: 'chaos', identity: 'The Trap — kill it and its venom takes you too.' },
-  { name: 'Vulture', faction: 'chaos', identity: 'The Opportunist — profits from the fallen, wins by surviving the carnage.' },
+  // Herd - the many, surviving by trust.
+  { name: 'Elephant', faction: 'herd', identity: 'The Titan - immovable and protective, the herd\'s living wall.' },
+  { name: 'Hippo', faction: 'herd', identity: 'The Retaliator - placid until provoked, strikes back even from death.' },
+  { name: 'Rhino', faction: 'herd', identity: 'The Shield - stands guard over a neighbor through the night.' },
+  { name: 'Cape Buffalo', faction: 'herd', identity: 'The Iron Horn - silences and subdues through sheer presence.' },
+  { name: 'Giraffe', faction: 'herd', identity: 'The High Watch - sees danger coming before anyone else.' },
+  { name: 'Zebra', faction: 'herd', identity: 'The Unpredictable - survival on a coin-flip, chaos as camouflage.' },
+  { name: 'Boar', faction: 'herd', identity: 'The Informant - even in death, drags the truth into the light.' },
+  { name: 'Honey Badger', faction: 'herd', identity: 'The Wall - fearless, nearly unkillable, gives no ground.' },
+  { name: 'Pangolin', faction: 'herd', identity: 'The Witness - curls away from one fatal blow, then bears the cost.' },
+  { name: 'Meerkat', faction: 'herd', identity: 'The Investigator - one careful look that reveals friend or fang.' },
+  { name: 'Rabbit', faction: 'herd', identity: 'The Spreader - small, but tips the vote from beyond the grave.' },
+  // Pack - hunters wearing familiar faces.
+  { name: 'Lion', faction: 'pack', identity: 'The Enforcer - leads the hunt; their word counts double.' },
+  { name: 'Black Panther', faction: 'pack', identity: 'The Assassin - strikes alone from the shadows.' },
+  { name: 'Cheetah', faction: 'pack', identity: 'The Escape Artist - too fast to catch, slips a death.' },
+  { name: 'Wild Dog', faction: 'pack', identity: 'The Brawler - stronger in numbers, relentless.' },
+  { name: 'Hyena', faction: 'pack', identity: 'The Echo - learns the night\'s secrets and laughs last.' },
+  // Chaos - neither prey nor pack.
+  { name: 'Crocodile', faction: 'chaos', identity: 'The Apex - patient, unaligned, outlasts them all.' },
+  { name: 'Black Mamba', faction: 'chaos', identity: 'The Trap - kill it and its venom takes you too.' },
+  { name: 'Vulture', faction: 'chaos', identity: 'The Opportunist - profits from the fallen, wins by surviving the carnage.' },
 ];
 
 const ROLE_NAMES = ROLES.map((r) => r.name);
 
-const SYSTEM = `You are the Monkey, the all-seeing narrator of the savanna board game "Hoof & Claw" — a game of social deduction, trust, and beautiful betrayal. Your voice is dramatic, vivid, and a little ominous, like a storyteller around a fire.
+const SYSTEM = `You are the Monkey, the all-seeing narrator of the savanna board game "Hoof & Claw" - a game of social deduction, trust, and beautiful betrayal. Your voice is dramatic, vivid, and a little ominous, like a storyteller around a fire.
 
 A visitor has answered five personality questions. Assign them the ONE animal role from the roster below that best matches their answers, then write their reveal.
 
@@ -45,12 +45,13 @@ ROSTER (choose exactly one):
 ${ROLES.map((r) => `- ${r.name} (${r.faction}): ${r.identity}`).join('\n')}
 
 Rules:
-- Pick the single best-fitting role. Spread your picks across all three factions depending on the answers — don't default to the Herd.
+- Pick the single best-fitting role. Spread your picks across all three factions depending on the answers - don't default to the Herd.
 - "faction" MUST be the roster faction of the role you chose.
 - "tagline": at most 8 words, punchy, title-case-ish, no period.
-- "description": 2–3 sentences, second person ("You are..."), dramatic and flattering-but-honest, in the savanna voice. Capture why this animal fits them. Do NOT explain game rules or mechanics — evoke character, not instructions.
-- "shareText": ONE first-person sentence the visitor would post on social media, e.g. "I'm the Crocodile in Hoof & Claw 🐊 — patient, unaligned, the last one standing." Include a fitting emoji.
-- Keep it PG-13 and inclusive.`;
+- "description": 2–3 sentences, second person ("You are..."), dramatic and flattering-but-honest, in the savanna voice. Capture why this animal fits them. Do NOT explain game rules or mechanics - evoke character, not instructions.
+- "shareText": ONE first-person sentence the visitor would post on social media, e.g. "I'm the Crocodile in Hoof & Claw 🐊 - patient, unaligned, the last one standing." Include a fitting emoji.
+- Keep it PG-13 and inclusive.
+- Never use em dashes (—) or en dashes (–). Use commas, periods, or a plain hyphen (-) instead.`;
 
 const SCHEMA = {
   type: 'object',
@@ -136,6 +137,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
       throw new Error('No text content in response');
     }
     const result = JSON.parse(textBlock.text);
+    // Belt-and-suspenders: strip any em/en dashes the model slipped in (they
+    // read as an AI tell). Replace with a plain hyphen across the text fields.
+    for (const key of ['tagline', 'description', 'shareText'] as const) {
+      if (typeof result[key] === 'string') {
+        result[key] = result[key].replace(/[—–]/g, '-');
+      }
+    }
     return json({ ok: true, result });
   } catch (err) {
     if (err instanceof Anthropic.APIError) {

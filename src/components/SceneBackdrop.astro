@@ -7,9 +7,9 @@ import night from '../assets/scenes/night.png';
 /**
  * Fixed, full-viewport cinematic backdrop. The SAME savanna transforms across
  * three faction-themed acts as the page scrolls:
- *   Act I  Dawn  — golden, hopeful        -> THE HERD
- *   Act II Dusk  — bloodied crimson sky    -> THE PACK
- *   Act III Night — deep, swallowing dark   -> CHAOS / betrayal
+ *   Act I  Dawn  - golden, hopeful        -> THE HERD
+ *   Act II Dusk  - bloodied crimson sky    -> THE PACK
+ *   Act III Night - deep, swallowing dark   -> CHAOS / betrayal
  * The script sets discrete phase variables (--dawn/--night/--blood/--dark) via
  * smoothstep so each act holds its tone; CSS only reads them (GPU-cheap).
  * Without JS it falls back to the dusk base layer.
@@ -52,7 +52,7 @@ const widths = [768, 1280, 1920, 2560];
   .scene__night { opacity: var(--night, 0); }
 
   .grade { position: absolute; inset: 0; pointer-events: none; }
-  /* THE PACK — bloodied dusk (crimson multiply, peaks mid-scroll). */
+  /* THE PACK - bloodied dusk (crimson multiply, peaks mid-scroll). */
   .grade--pack {
     background:
       radial-gradient(115% 95% at 50% 78%, rgba(170, 14, 14, 0.62), rgba(107, 26, 26, 0.4) 45%, transparent 80%),
@@ -60,7 +60,7 @@ const widths = [768, 1280, 1920, 2560];
     mix-blend-mode: multiply;
     opacity: var(--blood, 0);
   }
-  /* CHAOS — betrayal swallows the savanna in dark. */
+  /* CHAOS - betrayal swallows the savanna in dark. */
   .grade--chaos {
     background:
       radial-gradient(135% 105% at 50% 45%, rgba(4, 8, 10, 0.15), rgba(2, 3, 7, 0.85) 82%),
