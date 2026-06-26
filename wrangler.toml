@@ -1,0 +1,7 @@
+# Cloudflare Pages config. Cloudflare reads this at deploy time so the quiz's
+# server function (/api/quiz) gets Node compatibility — the Anthropic SDK needs
+# it. `pages_build_output_dir` points at Astro's build output.
+name = "hoof-and-claw-site"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-06-25"
+compatibility_flags = ["nodejs_compat"]

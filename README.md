@@ -53,6 +53,40 @@ Edit `src/config.ts`:
 The hero/CTA forms now subscribe visitors straight into Kit (double opt-in /
 unsubscribe handled by Kit). No API key is exposed on the site.
 
+## "Which Animal Are You?" quiz (Claude-powered)
+
+`/quiz` is an interactive 5-question quiz: Claude reads the answers and assigns
+the visitor a Hoof & Claw role (Herd / Pack / Chaos) with a dramatic write-up,
+then a "Claim your role" CTA pushes them to the Kickstarter (or the waitlist).
+
+How it works:
+- `src/components/AnimalQuiz.astro` — the UI (questions + result card + share).
+- `src/pages/api/quiz.ts` — an **on-demand** route (`prerender = false`) that runs
+  as a **Cloudflare Pages Function** and calls Claude. The role roster and the API
+  key stay server-side; the browser only ever sees its assigned role.
+- The rest of the site stays static. The `@astrojs/cloudflare` adapter enables the
+  single dynamic route (build emits `dist/_worker.js`).
+
+Setup (Cloudflare Pages):
+1. **Get a key:** <https://platform.claude.com> → add billing → API keys → Create.
+2. **Production:** Cloudflare dashboard → your Pages project → **Settings →
+   Variables and Secrets** → add `ANTHROPIC_API_KEY` (as a **Secret**) for
+   Production *and* Preview, then redeploy.
+3. **Node compatibility** is already declared in `wrangler.toml`
+   (`compatibility_flags = ["nodejs_compat"]`) — the Anthropic SDK needs it. If a
+   deploy ever complains, also set the `nodejs_compat` flag under **Settings →
+   Functions → Compatibility flags**.
+4. **Local testing:** create `.dev.vars` (gitignored) with
+   `ANTHROPIC_API_KEY=sk-ant-...`, then `npm run dev` and open `/quiz`.
+5. Set `links.kickstarter` in `src/config.ts` once the campaign is live — the quiz
+   CTA points there; until then it falls back to the waitlist.
+
+Cost/quality knobs live in `src/pages/api/quiz.ts`: the model is `claude-opus-4-8`
+at `effort: medium` (≈ a fraction of a cent per quiz). For a cheaper/faster public
+endpoint, switch the model to `claude-haiku-4-5`. Submissions are validated against
+the known questions before any API call, so the endpoint can't be used to send
+arbitrary prompts.
+
 ## Writing dev-log posts
 
 Add a Markdown file to `src/content/blog/`, e.g. `my-update.md`:

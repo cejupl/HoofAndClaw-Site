@@ -1,0 +1,99 @@
+---
+import Base from '../layouts/Base.astro';
+import AnimalQuiz from '../components/AnimalQuiz.astro';
+import Newsletter from '../components/Newsletter.astro';
+
+const title = 'Which Animal Are You? — Hoof & Claw';
+const description =
+  'Answer 5 questions and the Monkey will name your Hoof & Claw animal — Herd, Pack, or Chaos. Then claim your role and join the Kickstarter waitlist.';
+---
+
+<Base title={title} description={description}>
+  <header class="nav">
+    <a href="/" class="nav__brand display">Hoof &amp; Claw</a>
+    <nav class="nav__links">
+      <a href="/#herd">The Herd</a>
+      <a href="/#pack">The Pack</a>
+      <a href="/#chaos">Chaos</a>
+      <a href="/blog">Dev log</a>
+      <a href="/#waitlist" class="nav__cta">Join the waitlist</a>
+    </nav>
+  </header>
+
+  <main class="quiz-page">
+    <AnimalQuiz />
+
+    <section id="waitlist" class="quiz-page__waitlist">
+      <Newsletter
+        heading="Be first into the savanna"
+        sub="Your role is waiting. Join the waitlist and be first in line when the Kickstarter goes live."
+      />
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>© {new Date().getFullYear()} Hoof &amp; Claw. Watch the grass. Trust no one.</p>
+  </footer>
+</Base>
+
+<style>
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem clamp(1rem, 4vw, 2.5rem);
+    background: linear-gradient(180deg, rgba(10, 10, 18, 0.85), transparent);
+    backdrop-filter: blur(6px);
+  }
+  .nav__brand {
+    color: var(--color-gold-light);
+    text-decoration: none;
+    font-size: 1.15rem;
+  }
+  .nav__links {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.6rem, 2vw, 1.4rem);
+    flex-wrap: wrap;
+  }
+  .nav__links a {
+    color: var(--color-ink-muted);
+    text-decoration: none;
+    font-size: 0.95rem;
+  }
+  .nav__links a:hover {
+    color: var(--color-gold-light);
+  }
+  .nav__cta {
+    color: #1a1206 !important;
+    background: linear-gradient(180deg, var(--color-gold-light), var(--color-gold));
+    padding: 0.45rem 0.9rem;
+    border-radius: 0.6rem;
+    font-weight: 700;
+  }
+
+  .quiz-page {
+    position: relative;
+    z-index: 1;
+    padding: clamp(1.5rem, 5vw, 3rem) 0 4rem;
+  }
+  .quiz-page__waitlist {
+    width: min(46rem, 100%);
+    margin: 3rem auto 0;
+    padding: 0 clamp(1.25rem, 4vw, 2rem);
+    display: flex;
+    justify-content: center;
+  }
+  .footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 2rem 1rem 3rem;
+    color: rgba(196, 169, 106, 0.6);
+    font-size: 0.85rem;
+  }
+</style>

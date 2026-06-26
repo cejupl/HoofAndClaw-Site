@@ -38,6 +38,70 @@ export const site = {
   },
 };
 
+/**
+ * "Which Animal Are You?" quiz. The questions/options are public (rendered in the
+ * UI and used to validate submissions server-side). The mapping from answers to a
+ * Hoof & Claw role — and the dramatic write-up — is done by Claude in
+ * `src/pages/api/quiz.ts`, where the role roster lives server-side.
+ */
+export type QuizOption = { id: string; label: string };
+export type QuizQuestion = { id: string; prompt: string; options: QuizOption[] };
+
+export const quiz: { questions: QuizQuestion[] } = {
+  questions: [
+    {
+      id: 'q1',
+      prompt: 'Dawn breaks at the watering hole. Where are you?',
+      options: [
+        { id: 'a', label: 'Front and center, rallying everyone together' },
+        { id: 'b', label: 'On the edge, watching who watches whom' },
+        { id: 'c', label: 'Already three moves ahead of the herd' },
+        { id: 'd', label: 'Wherever the food is — politics can wait' },
+      ],
+    },
+    {
+      id: 'q2',
+      prompt: 'Someone accuses you of being a predator. You…',
+      options: [
+        { id: 'a', label: 'Calmly turn the suspicion back on them' },
+        { id: 'b', label: 'Laugh it off and make them look paranoid' },
+        { id: 'c', label: 'Go very still and let others defend you' },
+        { id: 'd', label: 'Double down — loudly, fearlessly' },
+      ],
+    },
+    {
+      id: 'q3',
+      prompt: 'Night falls. Your first instinct is to…',
+      options: [
+        { id: 'a', label: 'Protect someone you trust' },
+        { id: 'b', label: 'Hunt — quietly, precisely' },
+        { id: 'c', label: 'Gather information no one else has' },
+        { id: 'd', label: 'Wait. Patience is a weapon.' },
+      ],
+    },
+    {
+      id: 'q4',
+      prompt: 'Your real strength in a group is…',
+      options: [
+        { id: 'a', label: 'Brute resilience — you outlast everyone' },
+        { id: 'b', label: 'Reading people like open books' },
+        { id: 'c', label: 'Speed and timing — you strike first' },
+        { id: 'd', label: "You're impossible to pin down" },
+      ],
+    },
+    {
+      id: 'q5',
+      prompt: 'When the game is on the line, you would rather…',
+      options: [
+        { id: 'a', label: 'Win together, as a team' },
+        { id: 'b', label: 'Win alone, entirely by your own design' },
+        { id: 'c', label: 'Watch it all burn — and survive the ashes' },
+        { id: 'd', label: 'Be the one nobody ever saw coming' },
+      ],
+    },
+  ],
+};
+
 export type Faction = {
   id: 'herd' | 'pack' | 'chaos';
   name: string;

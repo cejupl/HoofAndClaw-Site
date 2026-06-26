@@ -1,6 +1,7 @@
 # build output
 dist/
 .astro/
+.vercel/
 
 # deps
 node_modules/
@@ -9,6 +10,9 @@ node_modules/
 .env
 .env.*
 !.env.example
+# Cloudflare local dev secrets (wrangler / platformProxy)
+.dev.vars
+.wrangler/
 
 # os / editor
 .DS_Store

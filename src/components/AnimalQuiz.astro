@@ -1,0 +1,414 @@
+---
+import { quiz, site } from '../config';
+
+// CTA target: the live Kickstarter if set, otherwise fall back to the waitlist.
+const kickstarter = site.links.kickstarter || '';
+---
+
+<section class="quiz" data-quiz data-kickstarter={kickstarter}>
+  <header class="quiz__head">
+    <p class="quiz__eyebrow narration">The Monkey is watching</p>
+    <h1 class="quiz__title display">Which Animal Are You?</h1>
+    <p class="quiz__sub">
+      Five questions. The savanna already knows what you are — answer honestly and
+      the Monkey will name your role in <strong>Hoof &amp; Claw</strong>.
+    </p>
+  </header>
+
+  <form class="quiz__form" data-quiz-form>
+    {
+      quiz.questions.map((q, i) => (
+        <fieldset class="q" data-q={q.id}>
+          <legend class="q__prompt">
+            <span class="q__num">{i + 1}</span>
+            {q.prompt}
+          </legend>
+          <div class="q__opts">
+            {q.options.map((o) => (
+              <label class="opt">
+                <input type="radio" name={q.id} value={o.id} />
+                <span class="opt__label">{o.label}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      ))
+    }
+
+    <button type="submit" class="quiz__submit" data-quiz-submit disabled>
+      Reveal my animal
+    </button>
+    <p class="quiz__err" data-quiz-err hidden></p>
+  </form>
+
+  <div class="quiz__loading" data-quiz-loading hidden>
+    <span class="quiz__spinner" aria-hidden="true"></span>
+    <p class="narration">The Monkey reads the grass…</p>
+  </div>
+
+  <article class="result" data-quiz-result hidden>
+    <p class="result__eyebrow narration">You are…</p>
+    <h2 class="result__role display" data-result-role></h2>
+    <p class="result__faction" data-result-faction></p>
+    <p class="result__tagline narration" data-result-tagline></p>
+    <p class="result__desc" data-result-desc></p>
+
+    <div class="result__cta">
+      <a class="btn btn--primary" data-result-claim href="/#waitlist">Claim your role →</a>
+      <button type="button" class="btn btn--ghost" data-result-share>Share my animal</button>
+      <button type="button" class="btn btn--ghost" data-result-retake>Take it again</button>
+    </div>
+    <p class="result__sharemsg" data-result-sharemsg hidden></p>
+  </article>
+</section>
+
+<style>
+  .quiz {
+    width: min(46rem, 100%);
+    margin: 0 auto;
+    padding: clamp(1.25rem, 4vw, 2rem);
+  }
+  .quiz__head {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .quiz__eyebrow {
+    color: var(--color-parchment-muted);
+    letter-spacing: 0.08em;
+  }
+  .quiz__title {
+    font-size: clamp(2rem, 6vw, 3.25rem);
+    color: var(--color-gold-light);
+    margin: 0.25rem 0 0.75rem;
+  }
+  .quiz__sub {
+    color: var(--color-ink-muted);
+    line-height: 1.6;
+    max-width: 34rem;
+    margin: 0 auto;
+  }
+
+  .q {
+    border: 1px solid rgba(201, 162, 39, 0.22);
+    border-radius: 1rem;
+    background: rgba(10, 10, 18, 0.5);
+    padding: 1.1rem 1.2rem;
+    margin: 0 0 1rem;
+    backdrop-filter: blur(4px);
+  }
+  .q__prompt {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    color: var(--color-parchment);
+    padding: 0;
+    margin-bottom: 0.85rem;
+  }
+  .q__num {
+    flex: 0 0 auto;
+    width: 1.6rem;
+    height: 1.6rem;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    color: #1a1206;
+    background: linear-gradient(180deg, var(--color-gold-light), var(--color-gold));
+  }
+  .q__opts {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .opt {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.7rem 0.85rem;
+    border-radius: 0.7rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition: border-color 0.12s ease, background 0.12s ease;
+  }
+  .opt:hover {
+    border-color: rgba(201, 162, 39, 0.5);
+  }
+  .opt:has(input:checked) {
+    border-color: var(--color-gold-light);
+    background: rgba(201, 162, 39, 0.16);
+  }
+  .opt input {
+    accent-color: var(--color-gold);
+    width: 1.05rem;
+    height: 1.05rem;
+    flex: 0 0 auto;
+  }
+  .opt__label {
+    color: var(--color-ink);
+    line-height: 1.4;
+  }
+
+  .quiz__submit,
+  .btn {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+  }
+  .quiz__submit {
+    width: 100%;
+    margin-top: 0.5rem;
+    padding: 0.95rem 1.4rem;
+    border: none;
+    color: #1a1206;
+    background: linear-gradient(180deg, var(--color-gold-light), var(--color-gold));
+    box-shadow: 0 6px 24px rgba(201, 162, 39, 0.3);
+  }
+  .quiz__submit:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  .quiz__submit:not(:disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 30px rgba(201, 162, 39, 0.45);
+  }
+  .quiz__err {
+    margin-top: 0.75rem;
+    color: var(--color-pack-light);
+    text-align: center;
+  }
+
+  .quiz__loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 2.5rem 0;
+    color: var(--color-parchment-muted);
+  }
+  .quiz__spinner {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 999px;
+    border: 3px solid rgba(201, 162, 39, 0.25);
+    border-top-color: var(--color-gold-light);
+    animation: quiz-spin 0.9s linear infinite;
+  }
+  @keyframes quiz-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .quiz__spinner {
+      animation-duration: 2.4s;
+    }
+  }
+
+  .result {
+    text-align: center;
+    border: 1px solid var(--accent, var(--color-gold));
+    border-radius: 1.25rem;
+    padding: clamp(1.5rem, 5vw, 2.5rem);
+    background: radial-gradient(
+      120% 120% at 50% 0%,
+      color-mix(in srgb, var(--accent, var(--color-gold)) 18%, transparent),
+      rgba(10, 10, 18, 0.75)
+    );
+    box-shadow: 0 18px 60px rgba(0, 0, 0, 0.5);
+  }
+  .result__eyebrow {
+    color: var(--color-parchment-muted);
+    letter-spacing: 0.06em;
+  }
+  .result__role {
+    font-size: clamp(2.25rem, 8vw, 4rem);
+    color: var(--accent, var(--color-gold-light));
+    margin: 0.25rem 0 0.35rem;
+    text-shadow: 0 0 30px color-mix(in srgb, var(--accent, var(--color-gold)) 45%, transparent);
+  }
+  .result__faction {
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.8rem;
+    color: var(--color-parchment-muted);
+    margin-bottom: 1rem;
+  }
+  .result__tagline {
+    font-size: 1.3rem;
+    color: var(--color-parchment);
+    margin-bottom: 1rem;
+  }
+  .result__desc {
+    color: var(--color-ink);
+    line-height: 1.7;
+    max-width: 36rem;
+    margin: 0 auto 1.75rem;
+  }
+  .result__cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    justify-content: center;
+  }
+  .btn {
+    padding: 0.8rem 1.3rem;
+    text-decoration: none;
+    display: inline-block;
+    border: 1px solid transparent;
+  }
+  .btn--primary {
+    color: #1a1206;
+    background: linear-gradient(180deg, var(--color-gold-light), var(--color-gold));
+    box-shadow: 0 6px 24px rgba(201, 162, 39, 0.3);
+  }
+  .btn--primary:hover {
+    transform: translateY(-1px);
+  }
+  .btn--ghost {
+    color: var(--color-ink);
+    background: rgba(0, 0, 0, 0.3);
+    border-color: rgba(201, 162, 39, 0.4);
+  }
+  .btn--ghost:hover {
+    border-color: var(--color-gold-light);
+  }
+  .result__sharemsg {
+    margin-top: 0.9rem;
+    color: var(--color-herd-light);
+    font-size: 0.9rem;
+  }
+</style>
+
+<script>
+  type QuizResult = {
+    role: string;
+    faction: 'herd' | 'pack' | 'chaos';
+    tagline: string;
+    description: string;
+    shareText: string;
+  };
+
+  const ACCENTS: Record<QuizResult['faction'], string> = {
+    herd: 'var(--color-herd-light)',
+    pack: 'var(--color-pack-light)',
+    chaos: 'var(--color-chaos-teal)',
+  };
+  const FACTION_LABEL: Record<QuizResult['faction'], string> = {
+    herd: 'The Herd',
+    pack: 'The Pack',
+    chaos: 'Chaos',
+  };
+
+  const root = document.querySelector<HTMLElement>('[data-quiz]');
+  if (root) {
+    const form = root.querySelector<HTMLFormElement>('[data-quiz-form]')!;
+    const submit = root.querySelector<HTMLButtonElement>('[data-quiz-submit]')!;
+    const errEl = root.querySelector<HTMLParagraphElement>('[data-quiz-err]')!;
+    const loading = root.querySelector<HTMLElement>('[data-quiz-loading]')!;
+    const result = root.querySelector<HTMLElement>('[data-quiz-result]')!;
+    const questionEls = Array.from(root.querySelectorAll<HTMLElement>('[data-q]'));
+    const kickstarter = root.dataset.kickstarter || '';
+
+    const allAnswered = () =>
+      questionEls.every((q) => q.querySelector<HTMLInputElement>('input:checked'));
+
+    form.addEventListener('change', () => {
+      submit.disabled = !allAnswered();
+    });
+
+    const showErr = (msg: string) => {
+      errEl.textContent = msg;
+      errEl.hidden = false;
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!allAnswered()) return;
+      errEl.hidden = true;
+
+      const answers = questionEls.map((q) => ({
+        questionId: q.dataset.q!,
+        optionId: q.querySelector<HTMLInputElement>('input:checked')!.value,
+      }));
+
+      form.hidden = true;
+      loading.hidden = false;
+
+      try {
+        const resp = await fetch('/api/quiz', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ answers }),
+        });
+        const data = await resp.json();
+        if (!resp.ok || !data.ok) {
+          throw new Error(data?.error || 'Something went wrong.');
+        }
+        renderResult(data.result as QuizResult);
+      } catch (err) {
+        loading.hidden = true;
+        form.hidden = false;
+        showErr(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+      }
+    });
+
+    function renderResult(r: QuizResult) {
+      const accent = ACCENTS[r.faction] ?? 'var(--color-gold)';
+      result.style.setProperty('--accent', accent);
+      result.querySelector('[data-result-role]')!.textContent = r.role;
+      result.querySelector('[data-result-faction]')!.textContent = FACTION_LABEL[r.faction] ?? '';
+      result.querySelector('[data-result-tagline]')!.textContent = r.tagline;
+      result.querySelector('[data-result-desc]')!.textContent = r.description;
+
+      const claim = result.querySelector<HTMLAnchorElement>('[data-result-claim]')!;
+      if (kickstarter) {
+        claim.href = kickstarter;
+        claim.textContent = 'Claim your role — back us on Kickstarter →';
+        claim.target = '_blank';
+        claim.rel = 'noopener';
+      } else {
+        claim.href = '/#waitlist';
+        claim.textContent = 'Claim your role — join the waitlist →';
+      }
+
+      const shareBtn = result.querySelector<HTMLButtonElement>('[data-result-share]')!;
+      const shareMsg = result.querySelector<HTMLParagraphElement>('[data-result-sharemsg]')!;
+      shareBtn.onclick = async () => {
+        const shareData = {
+          title: 'Hoof & Claw — Which Animal Are You?',
+          text: r.shareText,
+          url: location.href,
+        };
+        try {
+          if (navigator.share) {
+            await navigator.share(shareData);
+          } else {
+            await navigator.clipboard.writeText(`${r.shareText} ${location.href}`);
+            shareMsg.textContent = 'Copied to your clipboard — go share it!';
+            shareMsg.hidden = false;
+          }
+        } catch {
+          /* user dismissed the share sheet — ignore */
+        }
+      };
+
+      result.querySelector<HTMLButtonElement>('[data-result-retake]')!.onclick = () => {
+        result.hidden = true;
+        form.reset();
+        submit.disabled = true;
+        form.hidden = false;
+        root!.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      };
+
+      loading.hidden = true;
+      result.hidden = false;
+      result.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+</script>

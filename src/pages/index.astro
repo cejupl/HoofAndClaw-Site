@@ -80,6 +80,7 @@ const gallery = [
       <a href="#herd">The Herd</a>
       <a href="#pack">The Pack</a>
       <a href="#chaos">Chaos</a>
+      <a href="/quiz">Which animal?</a>
       <a href="/blog">Dev log</a>
       <a href="#waitlist" class="nav__cta">Join the waitlist</a>
     </nav>
@@ -207,6 +208,17 @@ const gallery = [
           ))
         }
       </div>
+    </section>
+
+    <!-- ===================== QUIZ TEASER ===================== -->
+    <section class="band band--center quiz-teaser">
+      <p class="act__phase">The Monkey is watching</p>
+      <h2 class="band__title display">Which animal are you?</h2>
+      <p class="band__sub">
+        Five questions. The savanna already knows. Answer honestly and the Monkey
+        will name your role — Herd, Pack, or Chaos.
+      </p>
+      <a href="/quiz" class="btn btn--primary quiz-teaser__btn">Find your animal →</a>
     </section>
 
     <!-- ===================== WAITLIST ===================== -->
@@ -429,6 +441,7 @@ const gallery = [
 
   /* ---------- bands ---------- */
   .band { max-width: 64rem; margin: 0 auto; }
+  .quiz-teaser__btn { display: inline-block; margin-top: 1.5rem; text-decoration: none; }
   .band--center { text-align: center; max-width: 52rem; }
   .band__title { font-size: clamp(1.8rem, 4.5vw, 3rem); color: var(--color-gold-light); text-align: center; text-wrap: balance; text-shadow: 0 2px 18px rgba(0,0,0,.6); }
   .band__sub { margin: 1rem auto 0; max-width: 44rem; text-align: center; color: var(--color-parchment); line-height: 1.65; font-size: 1.1rem; text-shadow: 0 1px 12px rgba(0,0,0,.6); }
