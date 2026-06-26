@@ -72,10 +72,12 @@ Setup (Cloudflare Pages):
 2. **Production:** Cloudflare dashboard → your Pages project → **Settings →
    Variables and Secrets** → add `ANTHROPIC_API_KEY` (as a **Secret**) for
    Production *and* Preview, then redeploy.
-3. **Node compatibility** is already declared in `wrangler.toml`
-   (`compatibility_flags = ["nodejs_compat"]`) — the Anthropic SDK needs it. If a
-   deploy ever complains, also set the `nodejs_compat` flag under **Settings →
-   Functions → Compatibility flags**.
+3. **Node compatibility:** the Anthropic SDK needs it. In the Pages project →
+   **Settings → Functions → Compatibility flags**, add `nodejs_compat` to both
+   Production and Preview (and set a recent Compatibility date). (We intentionally
+   do **not** ship a `wrangler.toml` — it flips Cloudflare into Workers-deploy
+   mode and breaks the Pages auto-publish; leave the project's **Deploy command
+   empty** so Pages publishes the `dist` output automatically.)
 4. **Local testing:** create `.dev.vars` (gitignored) with
    `ANTHROPIC_API_KEY=sk-ant-...`, then `npm run dev` and open `/quiz`.
 5. Set `links.kickstarter` in `src/config.ts` once the campaign is live — the quiz
