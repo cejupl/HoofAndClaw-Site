@@ -1,0 +1,9 @@
+# Cloudflare Pages config, used by the `npx wrangler pages deploy` deploy command.
+# - pages_build_output_dir: what gets published (Astro's build output)
+# - compatibility_flags: nodejs_compat — the Anthropic SDK needs it at runtime
+# `name` MUST match your existing Cloudflare Pages project name (the <name> in
+# <name>.pages.dev). Update it if yours differs.
+name = "hoof-and-claw-site"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-06-26"
+compatibility_flags = ["nodejs_compat"]
