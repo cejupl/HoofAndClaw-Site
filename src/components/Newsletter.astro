@@ -142,6 +142,12 @@ const isHero = variant === 'hero';
       flex-direction: column;
       align-items: stretch;
     }
+    /* In a column, the input's `flex: 1 1 14rem` would make 14rem its HEIGHT
+       (a tall box). Reset to natural height, full width. */
+    .newsletter__input {
+      flex: 0 0 auto;
+      width: 100%;
+    }
     .newsletter__btn {
       width: 100%;
     }
