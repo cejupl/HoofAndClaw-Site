@@ -1,0 +1,178 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import emblem from '../assets/emblem.png';
+
+// Kit's double-opt-in "after confirming" landing page. Set the form's
+// Incentive -> "After confirming, send subscribers to" to this URL.
+---
+
+<Base
+  title="You're in - Hoof & Claw"
+  description="Your subscription is confirmed. Welcome to the savanna - watch the grass with us until the migration begins."
+>
+  <header class="nav">
+    <a href="/" class="nav__brand display">Hoof &amp; Claw</a>
+    <nav class="nav__links">
+      <a href="/quiz">Which animal?</a>
+      <a href="/blog">Dev log</a>
+    </nav>
+  </header>
+
+  <main class="confirmed">
+    <div class="confirmed__card">
+      <div class="emblem-wrap">
+        <Image
+          src={emblem}
+          alt="Hoof &amp; Claw"
+          class="confirmed__emblem"
+          widths={[220, 340, 460]}
+          sizes="(max-width: 640px) 55vw, 20rem"
+          loading="eager"
+        />
+      </div>
+
+      <p class="confirmed__kicker narration">The grass parts. A new shape joins the herd.</p>
+
+      <h1 class="confirmed__title display">You're in.</h1>
+
+      <p class="confirmed__body">
+        Thank you - truly. Hoof &amp; Claw is a labor of long nights and beautiful
+        betrayals, and every name on this list is a reason to keep building it.
+        You'll be the first to hear when the migration begins: playtests,
+        dev-log drops, and the Kickstarter the moment it goes live.
+      </p>
+
+      <p class="confirmed__body confirmed__body--muted">
+        We write rarely and only when it matters. No noise - just the savanna,
+        when it has something to say.
+      </p>
+
+      <p class="confirmed__flourish narration">
+        Watch the grass. Trust no one. Survival is the only law.
+      </p>
+
+      <div class="confirmed__cta">
+        <a href="/" class="btn btn--primary">Return to the savanna</a>
+        <a href="/quiz" class="btn btn--ghost">Which animal are you?</a>
+      </div>
+    </div>
+  </main>
+</Base>
+
+<style>
+  /* Nav - mirrors index.astro so the page feels native. */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 1.4rem;
+    backdrop-filter: blur(8px);
+    background: rgba(10, 10, 18, 0.35);
+  }
+  .nav__brand {
+    color: var(--color-gold-light);
+    font-size: 1.15rem;
+    text-decoration: none;
+    letter-spacing: 0.06em;
+  }
+  .nav__links {
+    display: flex;
+    gap: 1.1rem;
+    align-items: center;
+  }
+  .nav__links a {
+    color: var(--color-ink);
+    text-decoration: none;
+    font-size: 0.95rem;
+    opacity: 0.85;
+  }
+  .nav__links a:hover {
+    opacity: 1;
+    color: var(--color-gold-light);
+  }
+
+  .confirmed {
+    min-height: calc(100vh - 4rem);
+    display: grid;
+    place-items: center;
+    padding: 3rem 1.25rem 4rem;
+  }
+  .confirmed__card {
+    max-width: 40rem;
+    text-align: center;
+    padding: 2.5rem 2rem;
+    border-radius: 1.25rem;
+    background: rgba(10, 8, 14, 0.55);
+    border: 1px solid rgba(201, 162, 39, 0.35);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(6px);
+  }
+  .confirmed__emblem {
+    width: min(55vw, 15rem);
+    height: auto;
+    margin: 0 auto 1rem;
+    filter: drop-shadow(0 12px 30px rgba(201, 162, 39, 0.35));
+  }
+  .confirmed__kicker {
+    color: var(--color-ink-muted);
+    font-size: 1.05rem;
+    margin-bottom: 0.4rem;
+  }
+  .confirmed__title {
+    color: var(--color-gold-light);
+    font-size: clamp(2.2rem, 6vw, 3.2rem);
+    margin: 0 0 1.1rem;
+    letter-spacing: 0.04em;
+  }
+  .confirmed__body {
+    color: var(--color-ink);
+    line-height: 1.65;
+    margin: 0 auto 1rem;
+    max-width: 34rem;
+  }
+  .confirmed__body--muted {
+    color: var(--color-ink-muted);
+    font-size: 0.95rem;
+  }
+  .confirmed__flourish {
+    color: var(--color-gold);
+    font-size: 1.1rem;
+    margin: 1.4rem 0 1.8rem;
+  }
+  .confirmed__cta {
+    display: flex;
+    gap: 0.9rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-block;
+    padding: 0.85rem 1.6rem;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .btn--primary {
+    color: #1a1206;
+    background: linear-gradient(180deg, var(--color-gold-light), var(--color-gold));
+    box-shadow: 0 10px 30px rgba(201, 162, 39, 0.4);
+  }
+  .btn--primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 40px rgba(201, 162, 39, 0.55);
+  }
+  .btn--ghost {
+    color: var(--color-ink);
+    border: 1.5px solid rgba(245, 230, 200, 0.4);
+  }
+  .btn--ghost:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-gold-light);
+    color: var(--color-gold-light);
+  }
+</style>
