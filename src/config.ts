@@ -14,13 +14,13 @@ export const site = {
   positioning:
     'A board game & companion app that turns any gathering into a night of hope, fear, and beautiful betrayal.',
   description:
-    'Hoof & Claw is a board game + companion app of social deduction on the savanna. Friends by day, predators by night. 6-20 players, 15-45 minutes, ages 13+. Join the waitlist for the Kickstarter.',
+    'Hoof & Claw is a board game + companion app of social deduction on the savanna. Friends by day, predators by night. 6–20 players, 15–45 minutes, ages 13+. Join the waitlist for the Kickstarter.',
   domain: 'https://hoofandclaw.org',
 
   // Play stats (advertised).
   stats: [
-    { value: '6-20', label: 'Players' },
-    { value: '15-45', label: 'Minutes' },
+    { value: '6–20', label: 'Players' },
+    { value: '15–45', label: 'Minutes' },
     { value: '13+', label: 'Ages' },
   ],
 
