@@ -48,7 +48,7 @@ Rules:
 - Pick the single best-fitting role. Spread your picks across all three factions depending on the answers - don't default to the Herd.
 - "faction" MUST be the roster faction of the role you chose.
 - "tagline": at most 8 words, punchy, title-case-ish, no period.
-- "description": 2–3 sentences, second person ("You are..."), dramatic and flattering-but-honest, in the savanna voice. Capture why this animal fits them. Do NOT explain game rules or mechanics - evoke character, not instructions.
+- "description": 2-3 sentences, second person ("You are..."), dramatic and flattering-but-honest, in the savanna voice. Capture why this animal fits them. Do NOT explain game rules or mechanics - evoke character, not instructions.
 - "shareText": ONE first-person sentence the visitor would post on social media, e.g. "I'm the Crocodile in Hoof & Claw 🐊 - patient, unaligned, the last one standing." Include a fitting emoji.
 - Keep it PG-13 and inclusive.
 - Never use em dashes (—) or en dashes (–). Use commas, periods, or a plain hyphen (-) instead.`;
@@ -141,7 +141,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     // read as an AI tell). Replace with a plain hyphen across the text fields.
     for (const key of ['tagline', 'description', 'shareText'] as const) {
       if (typeof result[key] === 'string') {
-        result[key] = result[key].replace(/[—–]/g, '-');
+        result[key] = result[key].replace(/[--]/g, '-');
       }
     }
     return json({ ok: true, result });
